@@ -16,13 +16,13 @@
 
 Архитектура проекта
 
-1. Frontend:
+- Frontend:
    - HTML-форма для ввода данных (пробег, расход топлива, тип топлива).
    - Кнопка для отправки данных на сервер.
    - Отображение результатов расчета выбросов.
    - JavaScript для отправки POST-запросов на сервер и отображения ответа.
 
-2. Backend:
+- Backend:
    - REST API с маршрутом `/calculate-emissions` для обработки POST-запросов.
    - Логика расчета выбросов CO₂, N₂O и CH₄ с учетом их глобального потепляющего потенциала (GWP).
    - Обработка ошибок ввода данных.
@@ -30,65 +30,67 @@
 ---
 
 API Спецификация
+
   Эндпоинты:
-    POST /calculate-emissions - используется для расчета выбросов.
+   1. POST /calculate-emissions - используется для расчета выбросов.
 
-  Запрос (JSON):
-  {
-    "distance": <float>,         // Пробег (в километрах)
-    "fuelConsumption": <float>, // Расход топлива (литры на 100 км)
-    "fuelType": <string>        // Тип топлива (например, "Бензин")
-  }
+    - Запрос (JSON):
+    {
+      "distance": <float>,         // Пробег (в километрах)
+      "fuelConsumption": <float>, // Расход топлива (литры на 100 км)
+      "fuelType": <string>        // Тип топлива (например, "Бензин")
+    }
 
 
-  Ответ (JSON):
-  {
-    "emissionsCO2": <float>,           // Выбросы CO₂ (в кг)
-    "emissionsN2O": <float>,           // Выбросы N₂O (в кг)
-    "emissionsCH4": <float>,           // Выбросы CH₄ (в кг)
-    "emissionsN2O_CO2e": <float>,      // Эквивалент выбросов N₂O в CO₂ (в кг)
-    "emissionsCH4_CO2e": <float>,      // Эквивалент выбросов CH₄ в CO₂ (в кг)
-    "totalEmissionsCO2e": <float>      // Общий эквивалент выбросов CO₂ (в кг)
-  }
+     - Ответ (JSON):
+    {
+      "emissionsCO2": <float>,           // Выбросы CO₂ (в кг)
+      "emissionsN2O": <float>,           // Выбросы N₂O (в кг)
+      "emissionsCH4": <float>,           // Выбросы CH₄ (в кг)
+      "emissionsN2O_CO2e": <float>,      // Эквивалент выбросов N₂O в CO₂ (в кг)
+      "emissionsCH4_CO2e": <float>,      // Эквивалент выбросов CH₄ в CO₂ (в кг)
+      "totalEmissionsCO2e": <float>      // Общий эквивалент выбросов CO₂ (в кг)
+    }
 
-  GET /calculate-emissions - выдает сообщение: "Этот маршрут поддерживает только POST-запросы."
+  2. GET /calculate-emissions - выдает сообщение: "Этот маршрут поддерживает только POST-запросы."
 
 ---
   
 Логическая часть (основные рассчетные формулы):
 
-  Расчет общего объема использованного топлива (в литрах):
+  - Расчет общего объема использованного топлива (в литрах):
     fuelUsed = (distance * fuelConsumption) / 100
 
-  Расчет выбросов CO2, N2O и CH4:
-    CO2_EMISSION_FACTOR = 2.31; // C02 бенз
-    N2O_EMISSION_FACTOR = 0.0003; // N2O бенз
-    CH4_EMISSION_FACTOR = 0.0001; // CH4 бенз
+  - Расчет выбросов CO2, N2O и CH4:
+    CO2_EMISSION_FACTOR = 2.31; // C02 бенз;
+    N2O_EMISSION_FACTOR = 0.0003; // N2O бенз;
+    CH4_EMISSION_FACTOR = 0.0001; // CH4 бенз;
     emissionsCO2 = fuelUsed * CO2_EMISSION_FACTOR;
     emissionsN2O = fuelUsed * N2O_EMISSION_FACTOR;
     emissionsCH4 = fuelUsed * CH4_EMISSION_FACTOR;
     
-  Перевод выбросов N2O и CH4 в углеродный эквивалент:
-    GWP_N2O = 298
-    GWP_CH4 = 25
-    emissionsN2O_CO2e = emissionsN2O * GWP_N2O
-    emissionsCH4_CO2e = emissionsCH4 * GWP_CH4
+  - Перевод выбросов N2O и CH4 в углеродный эквивалент:
+    GWP_N2O = 298;
+    GWP_CH4 = 25;
+    emissionsN2O_CO2e = emissionsN2O * GWP_N2O;
+    emissionsCH4_CO2e = emissionsCH4 * GWP_CH4;
 
-  Общий углеродный эквивалент выбросов:
+  - Общий углеродный эквивалент выбросов:
     const totalEmissionsCO2e = emissionsCO2 + emissionsN2O_CO2e + emissionsCH4_CO2e;
 
 ---
 
 Безопастность и обеспечение работы:
-  Helmet.js - защита от уязвимостей
-  CORS - кросс-доменные запросы
-  Валидация входных данных - проверка входных данных на корректность
+  - Helmet.js - защита от уязвимостей
+  - CORS - кросс-доменные запросы
+  - Валидация входных данных - проверка входных данных на корректность
 
 ---
 
 Планируемые улучшения:
-  Добавление других видов топлива
-  Сохранение истории рассчетов и статистика
-  Улучшение интерфейса
+  - Залить сайт на хост
+  - Добавление других видов топлива
+  - Сохранение истории рассчетов и статистика
+  - Улучшение интерфейса
   
   
