@@ -62,26 +62,25 @@ API Спецификация
     fuelUsed = (distance * fuelConsumption) / 100
 
   - Расчет выбросов CO2, N2O и CH4:
-    {
-      CO2_EMISSION_FACTOR = 2.31; // C02 бенз;
-      N2O_EMISSION_FACTOR = 0.0003; // N2O бенз;
-      CH4_EMISSION_FACTOR = 0.0001; // CH4 бенз;
-      emissionsCO2 = fuelUsed * CO2_EMISSION_FACTOR;
-      emissionsN2O = fuelUsed * N2O_EMISSION_FACTOR;
-      emissionsCH4 = fuelUsed * CH4_EMISSION_FACTOR;
-    }
+    
+        CO2_EMISSION_FACTOR = 2.31 - C02 бенз;
+        N2O_EMISSION_FACTOR = 0.0003; - N2O бенз;
+        CH4_EMISSION_FACTOR = 0.0001 - CH4 бенз;
+        emissionsCO2 = fuelUsed * CO2_EMISSION_FACTOR;
+        emissionsN2O = fuelUsed * N2O_EMISSION_FACTOR;
+        emissionsCH4 = fuelUsed * CH4_EMISSION_FACTOR;
     
   - Перевод выбросов N2O и CH4 в углеродный эквивалент:
-   {
-    GWP_N2O = 298;
-    GWP_CH4 = 25;
-    emissionsN2O_CO2e = emissionsN2O * GWP_N2O;
-    emissionsCH4_CO2e = emissionsCH4 * GWP_CH4;
-  }
+    
+        GWP_N2O = 298;
+        GWP_CH4 = 25;
+        emissionsN2O_CO2e = emissionsN2O * GWP_N2O;
+        emissionsCH4_CO2e = emissionsCH4 * GWP_CH4;
+    
   - Общий углеродный эквивалент выбросов:
-   { 
-    const totalEmissionsCO2e = emissionsCO2 + emissionsN2O_CO2e + emissionsCH4_CO2e;
-  }
+    
+         totalEmissionsCO2e = emissionsCO2 + emissionsN2O_CO2e + emissionsCH4_CO2e;
+  
 ---
 
 Безопастность и обеспечение работы:
