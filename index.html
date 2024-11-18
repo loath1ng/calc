@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8"> <!-- Устанавливает кодировку страницы UTF-8 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Адаптирует страницу для мобильных устройств -->
+    <title>Калькулятор углеродного следа</title> <!-- Заголовок страницы -->
+
+    <style>
+        /* Оформление для всей страницы */
+        body {
+            font-family: Arial, sans-serif; /* Шрифт для текста */
+            display: flex; /* Использует flexbox для центрирования */
+            flex-direction: column; /* Располагает элементы вертикально */
+            align-items: center; /* Центрирует элементы по горизонтали */
+            justify-content: center; /* Центрирует элементы по вертикали */
+            min-height: 100vh; /* Минимальная высота экрана — 100% высоты окна браузера */
+            background-color: #f0f2f5; /* Цвет фона */
+            margin: 0; /* Убирает отступы вокруг страницы */
+        }
+        /* Стили для контейнера с формой */
+        .container {
+            width: 300px; /* Ширина формы */
+            padding: 20px; /* Внутренние отступы */
+            background-color: #fff; /* Белый фон */
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Легкая тень вокруг контейнера */
+            border-radius: 8px; /* Скругленные углы */
+        }
+        .container h1 {
+            font-size: 1.5em; /* Размер заголовка */
+            margin-bottom: 10px; /* Отступ снизу */
+        }
+        .container label {
+            display: block; /* Выводит метки на отдельной строке */
+            margin-top: 10px; /* Отступ сверху */
+        }
+        .container input, .container select {
+            width: 100%; /* Полная ширина элемента */
+            padding: 8px; /* Внутренний отступ */
+            margin-top: 5px; /* Отступ сверху */
+            box-sizing: border-box; /* Включает padding и border в ширину/высоту элемента */
+            border: 1px solid #ccc; /* Серый бордюр */
+            border-radius: 4px; /* Скругленные углы */
+        }
+        .container button {
+            width: 100%; /* Полная ширина кнопки */
+            padding: 10px; /* Внутренний отступ */
+            margin-top: 15px; /* Отступ сверху */
+            border: none; /* Убирает бордюр */
+            background-color: #28a745; /* Зеленый фон */
+            color: #fff; /* Белый текст */
+            font-size: 1em; /* Размер текста */
+            border-radius: 4px; /* Скругленные углы */
+            cursor: pointer; /* Курсор "указатель" при наведении */
+        }
+        .container button:hover {
+            background-color: #218838; /* Более темный зеленый цвет при наведении */
+        }
+        .results {
+            margin-top: 20px; /* Отступ сверху для блока с результатами */
+        }
+    </style>
+</head>
+<body>
+    <!-- Основной контейнер -->
+    <div class="container">
+        <h1>Калькулятор выбросов CO₂</h1> <!-- Заголовок формы -->
+
+        <!-- Поле ввода для пробега -->
+        <label for="distance">Пробег (км):</label>
+        <input type="number" id="distance" min="0" placeholder="Введите пробег в км">
+
+        <!-- Поле ввода для расхода топлива -->
+        <label for="fuelConsumption">Расход топлива (л/100 км):</label>
+        <input type="number" id="fuelConsumption" min="0" placeholder="Введите расход топлива">
+
+        <!-- Выпадающий список для выбора типа топлива -->
+        <label for="fuelType">Тип топлива:</label>
+        <select id="fuelType">
+            <option value="Бензин">Бензин</option> <!-- Тип топлива "Бензин" -->
+            <!-- Можно добавить другие типы топлива позже -->
+        </select>
+
+        <!-- Кнопка для расчета выбросов -->
+        <button onclick="calculateEmissions()">Рассчитать выбросы</button>
+
+        <!-- Контейнер для отображения результатов -->
+        <div class="results" id="results"></div>
+    </div>
+
+    <script>
+        // Асинхронная функция для расчета выбросов
+        async function calculateEmissions() {
+            // Получаем значения из полей ввода
+            const distance = document.getElementById('distance').value;
+            const fuelConsumption = document.getElementById('fuelConsumption').value;
+            const fuelType = document.getElementById('fuelType').value;
+
+            // Проверка на заполненность полей
+            if (!distance || !fuelConsumption) {
+                alert('Пожалуйста, заполните все поля.'); // Показываем предупреждение
+                return;
+            }
+
+            try {
+                // Отправляем POST-запрос на сервер
+                const response = await fetch('http://127.0.0.1:5000/calculate-emissions', {
+                    method: 'POST', // Метод запроса
+                    headers: {
+                        'Content-Type': 'application/json' // Устанавливаем тип данных
+                    },
+                    body: JSON.stringify({
+                        distance: parseFloat(distance), // Преобразуем в число
+                        fuelConsumption: parseFloat(fuelConsumption), // Преобразуем в число
+                        fuelType // Тип топлива
+                    })
+                });
+
+                // Проверка на успешность ответа
+                if (!response.ok) {
+                    const errorData = await response.json(); // Парсим ошибку
+                    document.getElementById('results').innerHTML = `<p style="color: red;">Ошибка: ${errorData.error}</p>`;
+                    return;
+                }
+
+                // Обрабатываем успешный ответ
+                const data = await response.json(); // Парсим данные в JSON
+                document.getElementById('results').innerHTML = `
+                    <h3>Результаты расчета:</h3>
+                    <p>Выбросы CO₂: ${data.emissionsCO2.toFixed(2)} кг</p>
+                    <p>Выбросы N₂O: ${data.emissionsN2O.toFixed(4)} кг</p>
+                    <p>Выбросы CH₄: ${data.emissionsCH4.toFixed(4)} кг</p>
+                    <p>Эквивалент выбросов N₂O (CO₂e): ${data.emissionsN2O_CO2e.toFixed(2)} кг</p>
+                    <p>Эквивалент выбросов CH₄ (CO₂e): ${data.emissionsCH4_CO2e.toFixed(2)} кг</p>
+                    <p><strong>Общий эквивалент выбросов CO₂e: ${data.totalEmissionsCO2e.toFixed(2)} кг</strong></p>
+                `;
+            } catch (error) {
+                // Обработка ошибок сети или других сбоев
+                document.getElementById('results').innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
