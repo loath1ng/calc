@@ -13,7 +13,7 @@
     "calculator",
     "API"
   ],
-  "author": "Ваше Имя",
+  "author": "Roman Gusev",
   "license": "MIT",
   "dependencies": {
     "cors": "^2.8.5",

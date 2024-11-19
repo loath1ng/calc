@@ -14,7 +14,8 @@ const cors = require('cors');
 app.use(cors());
 
 // Порты для сервера
-const PORT = 5000;
+const PORT = process.env.PORT || 5000; // Используем PORT от Railway или 5000 по умолчанию
+
 
 // Словарь коэффициентов выбросов для разных видов топлива (в кг/л)
 const EMISSION_FACTORS = {
