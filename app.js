@@ -8,7 +8,7 @@ app.use(helmet());
 
 // MongoDB подключение
 const mongoose = require('mongoose');
-mongoose.connect('mongodb+srv://gusevroman2016:<db_password>@cluster0.ahjnu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
+mongoose.connect('mongodb+srv://<Admin>:<imeF_YDfy7i4cce>@cluster0.mongodb.net/myDatabase?retryWrites=true&w=majority=mongodb+srv://<Admin>:<imeF_YDfy7i4cce>@cluster0.ahjnu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => {
