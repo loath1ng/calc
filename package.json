@@ -2,7 +2,7 @@
   "name": "carbon-footprint-calculator",
   "version": "1.0.0",
   "description": "API для расчета углеродного следа.",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js"
