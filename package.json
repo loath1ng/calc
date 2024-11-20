@@ -23,6 +23,7 @@
     "helmet": "^6.0.1",
     "install": "^0.13.0",
     "mongodb": "^6.10.0",
+    "mongoose": "^8.8.2",
     "react-router-dom": "^6.28.0"
   },
   "devDependencies": {
