@@ -42,7 +42,6 @@ const authenticate = (req, res, next) => {
 
 
 // Модель для сохранения результатов
-const mongoose = require('mongoose');
 
 const CalculationSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
