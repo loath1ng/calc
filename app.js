@@ -7,7 +7,6 @@ const helmet = require('helmet');
 app.use(helmet());
 
 // MongoDB подключение
-const express = require('express');
 const app = express();
 const mongoose = require('./db');
 
