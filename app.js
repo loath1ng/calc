@@ -7,15 +7,9 @@ const helmet = require('helmet');
 app.use(helmet());
 
 // MongoDB подключение
-const mongoose = require('mongoose');
-mongoose.connect('mongodb+srv://<Admin>:<imeF_YDfy7i4cce>@cluster0.mongodb.net/myDatabase?retryWrites=true&w=majority=mongodb+srv://<Admin>:<imeF_YDfy7i4cce>@cluster0.ahjnu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => {
-    console.log('Connected to MongoDB');
-}).catch((err) => {
-    console.error('MongoDB connection error:', err);
-});
+const express = require('express');
+const app = express();
+const mongoose = require('./db');
 
 
 // Middleware для обработки JSON-запросов
@@ -41,7 +35,6 @@ const authenticate = (req, res, next) => {
 
 
 
-// Модель для сохранения результатов
 
 const CalculationSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
