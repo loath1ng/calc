@@ -6,10 +6,6 @@ const app = express();
 const helmet = require('helmet');
 app.use(helmet());
 
-// MongoDB подключение
-const mongoose = require('./db');
-
-
 // Middleware для обработки JSON-запросов
 app.use(express.json());
 
@@ -17,122 +13,8 @@ app.use(express.json());
 const cors = require('cors');
 app.use(cors());
 
-// Middleware для проверки токенов
-const authenticate = (req, res, next) => {
-    const token = req.header('Authorization');
-    if (!token) return res.status(401).json({ error: 'Доступ запрещен' });
-
-    try {
-        const verified = jwt.verify(token, 'your_jwt_secret');
-        req.user = verified;
-        next();
-    } catch (err) {
-        res.status(400).json({ error: 'Недействительный токен' });
-    }
-};
-
-
-
-
-const CalculationSchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    distance: Number,
-    fuelConsumption: Number,
-    fuelType: String,
-    totalEmissionsCO2e: Number,
-    date: { type: Date, default: Date.now }
-});
-
-module.exports = mongoose.model('Calculation', CalculationSchema);
-
-
-// Логика сохранений
-app.post('/calculate-emissions', authenticate, async (req, res) => {
-    const { distance, fuelConsumption, fuelType } = req.body;
-
-    try {
-        const results = calculateEmissions(distance, fuelConsumption, fuelType);
-
-        // Сохранение в базе данных
-        const newCalculation = new Calculation({
-            userId: req.user.id,
-            distance,
-            fuelConsumption,
-            fuelType,
-            totalEmissionsCO2e: results.totalEmissionsCO2e
-        });
-        await newCalculation.save();
-
-        res.json(results);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-
-// Вывод статистики
-app.get('/stats', authenticate, async (req, res) => {
-    const stats = await Calculation.find({ userId: req.user.id });
-    res.json(stats);
-});
-
-
-
 // Порты для сервера
 const PORT = process.env.PORT || 5000; // Используем PORT от Railway или 5000 по умолчанию
-
-
-
-// Константы для регистрации
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const User = require('./models/User'); // Модель пользователя
-
-// Регистрация
-app.post('/register', async (req, res) => {
-    const { username, password } = req.body;
-
-    // Проверка наличия пользователя
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-        return res.status(400).json({ error: 'Пользователь уже существует' });
-    }
-
-    // Хеширование пароля
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Создание нового пользователя
-    const newUser = new User({ username, password: hashedPassword });
-    await newUser.save();
-
-    res.json({ message: 'Регистрация успешна' });
-});
-
-
-// Вход
-app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-
-    // Проверка пользователя
-    const user = await User.findOne({ username });
-    if (!user) {
-        return res.status(400).json({ error: 'Неверное имя пользователя или пароль' });
-    }
-
-    // Проверка пароля
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-        return res.status(400).json({ error: 'Неверное имя пользователя или пароль' });
-    }
-
-    // Генерация JWT
-    const token = jwt.sign({ id: user._id }, 'your_jwt_secret', { expiresIn: '1d' });
-    res.json({ token });
-});
-
-
-
-
 
 
 // Словарь коэффициентов выбросов для разных видов топлива (в кг/л)
