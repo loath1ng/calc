@@ -14,38 +14,32 @@ const cors = require('cors');
 app.use(cors());
 
 // Порты для сервера
-const PORT = process.env.PORT || 5000; // Используем PORT от Railway или 5000 по умолчанию
-
-
-// Словарь коэффициентов выбросов для разных видов топлива (в кг/л)
-const EMISSION_FACTORS = {
-    'Бензин': { CO2: 2.31, N2O: 0.0003, CH4: 0.0001 },
-    'Дизель': { CO2: 2.68, N2O: 0.0004, CH4: 0.0001 },
-    'Природный газ': { CO2: 2.75, N2O: 0.0002, CH4: 0.0002 }
-};
-
-// GWP индекс для N2O и CH4
-const GWP_N2O = 298;
-const GWP_CH4 = 25;
+const PORT = 8080;
 
 // Основная формула расчета выбросов CO2, N2O и CH4
 const calculateEmissions = (distance, fuelConsumption, fuelType) => {
-    const fuelUsed = (distance / 100) * fuelConsumption;
+    // Выбросы парниковых газов от сжигания 1л бензина (в кг/л)
+    const CO2_EMISSION_FACTOR = 2.31; // C02 бенз
+    const N2O_EMISSION_FACTOR = 0.0003; // N2O бенз
+    const CH4_EMISSION_FACTOR = 0.0001; // CH4 бенз
 
-    const factors = EMISSION_FACTORS[fuelType];
-    if (!factors) {
-        throw new Error(`Неизвестный тип топлива: ${fuelType}`);
-    }
+    // GWP индекс для N2O и CH4
+    const GWP_N2O = 298;
+    const GWP_CH4 = 25;
 
-    const { CO2: CO2_FACTOR, N2O: N2O_FACTOR, CH4: CH4_FACTOR } = factors;
+    // Расчет общего объема использованного топлива (в литрах)
+    const fuelUsed = (distance * fuelConsumption) / 100;
 
-    const emissionsCO2 = fuelUsed * CO2_FACTOR;
-    const emissionsN2O = fuelUsed * N2O_FACTOR;
-    const emissionsCH4 = fuelUsed * CH4_FACTOR;
+    // Расчет выбросов CO2, N2O и CH4
+    const emissionsCO2 = fuelUsed * CO2_EMISSION_FACTOR;
+    const emissionsN2O = fuelUsed * N2O_EMISSION_FACTOR;
+    const emissionsCH4 = fuelUsed * CH4_EMISSION_FACTOR;
 
+    // Перевод выбросов N2O и CH4 в углеродный эквивалент
     const emissionsN2O_CO2e = emissionsN2O * GWP_N2O;
     const emissionsCH4_CO2e = emissionsCH4 * GWP_CH4;
 
+    // Общий углеродный эквивалент выбросов
     const totalEmissionsCO2e = emissionsCO2 + emissionsN2O_CO2e + emissionsCH4_CO2e;
 
     return {
@@ -63,23 +57,15 @@ app.post('/calculate-emissions', (req, res) => {
     const { distance, fuelConsumption, fuelType } = req.body;
 
     // Проверка входных данных
-    if (!distance || !fuelConsumption || !fuelType) {
+    if (!distance || !fuelConsumption || !fuelType || fuelType !== 'Бензин') {
         return res.status(400).json({ error: 'Пожалуйста, предоставьте корректные данные (пробег, расход топлива, тип топлива).' });
     }
 
-    if (!EMISSION_FACTORS[fuelType]) {
-        return res.status(400).json({ error: `Тип топлива "${fuelType}" не поддерживается.` });
-    }
-
-    try {
-        // Расчет выбросов
-        const results = calculateEmissions(distance, fuelConsumption, fuelType);
-
-        // Отправка ответа с результатами
-        res.json(results);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+    // Расчет выбросов
+    const results = calculateEmissions(distance, fuelConsumption, fuelType);
+    
+    // Отправка ответа с результатами
+    res.json(results);
 });
 
 app.get('/calculate-emissions', (req, res) => {
@@ -89,4 +75,5 @@ app.get('/calculate-emissions', (req, res) => {
 // Запуск сервера
 app.listen(PORT, () => {
     console.log(`Сервер запущен на http://127.0.0.1:${PORT}`);
-});
+}
+);
