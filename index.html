@@ -134,6 +134,16 @@
                     })
                 });
 
+                // Проверка статуса ответа
+                if (!response.ok) {
+                const errorText = await response.text();  // Получаем текстовый ответ, если не 200
+                console.log('Ответ от сервера:', errorText);
+                return;
+                }
+
+                // Если ответ в формате JSON, парсим его
+                const data = await response.json();
+
                 // Проверяем, успешно ли выполнен запрос
                 if (!response.ok) {
                     // Если сервер вернул ошибку, выводим сообщение с деталями
