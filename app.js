@@ -6,11 +6,6 @@ const app = express();
 const helmet = require('helmet');
 app.use(helmet());
 
-app.use(cors({
-    origin: '*', // Разрешает все домены
-}));
-
-
 // Middleware для обработки JSON-запросов
 app.use(express.json());
 
